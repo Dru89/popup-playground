@@ -1,0 +1,40 @@
+<h1>popup (/popup)</h1>
+<div>
+  <label>
+    <b>send to:</b>
+    <select id="frames"></select>
+    <br />
+    <button id="ping">ping!</button>
+  </label>
+</div>
+<div>
+  <h2>messages:</h2>
+  <pre id="messages"></pre>
+</div>
+<script id="config" type="application/json">{{{json config}}}</script>
+
+<script type="text/javascript">
+const config = JSON.parse(document.getElementById('config').textContent);
+const pingButton = document.getElementById('ping');
+const framesSelect = document.getElementById('frames');
+const messagePre = document.getElementById('messages');
+
+const clientUrl = new URL("/", config.domains.client).toString();
+const clientOption = document.createElement('option');
+clientOption.value = "client";
+clientOption.textContent = clientUrl.toString();
+framesSelect.appendChild(clientOption);
+
+pingButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  const selectedFrame = framesSelect.value;
+  if (selectedFrame === "iframe") {
+    iframeElem.contentWindow.postMessage("ping", config.domains.iframe);
+  } else {
+    if (popup.win == null) {
+      throw new Error("can't post to popup. window is null");
+    }
+    popup.win.postmessage("ping", config.domains.popup);
+  }
+});
+</script>
